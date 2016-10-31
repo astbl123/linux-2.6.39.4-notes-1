@@ -575,6 +575,11 @@ static const struct block_device_operations zram_devops = {
 	.owner = THIS_MODULE
 };
 
+/**
+ * 再调用该函数来在/dev目录下创建相应的设备节点[1].
+ *
+ * @see Linux自动创建设备节点(http://blog.chinaunix.net/uid-26119896-id-3246974.html)
+ */
 static int create_device(struct zram *zram, int device_id)
 {
 	int ret = 0;
