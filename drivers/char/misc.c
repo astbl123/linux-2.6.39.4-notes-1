@@ -168,6 +168,8 @@ static const struct file_operations misc_fops = {
 /**
  * 混杂设备注册函数[1]P231.
  * 
+ * 设备文件与普通文件不同，不能使用IO函数建立, 需要使用该函数建立[2]P78.
+ *
  * 该函数内部检查次设备号是否合法, 如果次设备号被占用, 则返回设备忙
  * 状态. 如果miscdevice的成员minor为255, 则尝试动态申请一个设备号.
  * 当设备号可用时, 函数会将混杂设备注册到内核的设备模型中[1]P231.
@@ -188,8 +190,8 @@ static const struct file_operations misc_fops = {
  *	A zero is returned on success and a negative errno code for
  *	failure.
  *
- *	@see Linux驱动开发入门与实战(2)
- *	@see Android深度探索(卷1)
+ *	@see [1]Linux驱动开发入门与实战(2)
+ *	@see [2]Android深度探索(卷1)
  */
 int misc_register(struct miscdevice * misc)
 {

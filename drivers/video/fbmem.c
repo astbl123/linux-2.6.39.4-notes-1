@@ -1356,6 +1356,17 @@ static long fb_compat_ioctl(struct file *file, unsigned int cmd,
 }
 #endif
 
+/**
+ * 如果应用程序调用mmap()函数进行内存映射, 那么FrameBuffer驱动就会
+ * 调用该函数[1]P460.
+ *
+ * 该函数分两种情况进行内存映射: 
+ * 		1) 如果Linux内核安装的FrameBuffer驱动未设置fb_info.fbops.fb_mmap
+ * 		   成员变量, 会在该函数中地调用io_remap_pfn_range()函数进行内存映射; 
+ * 		2) 否则使用fb_mmap指向的函数进行内存映射[1]P461.
+ *
+ * @see [1]Android深度探索(卷1)
+ */
 static int
 fb_mmap(struct file *file, struct vm_area_struct * vma)
 {
@@ -1376,11 +1387,12 @@ fb_mmap(struct file *file, struct vm_area_struct * vma)
 	mutex_lock(&info->mm_lock);
 	if (fb->fb_mmap) {
 		int res;
-		res = fb->fb_mmap(info, vma);
+		res = fb->fb_mmap(info, vma); /* 调用fb_mmap成员变量指向的函数进行内存映射[1]P461. */
 		mutex_unlock(&info->mm_lock);
 		return res;
 	}
 
+	/* 如果FrameBuffer驱动未设置fb_info.fb_mmap成员变量, 执行下面的代码[1]P461. */
 	/* frame buffer memory */
 	start = info->fix.smem_start;
 	len = PAGE_ALIGN((start & ~PAGE_MASK) + info->fix.smem_len);
@@ -1404,6 +1416,8 @@ fb_mmap(struct file *file, struct vm_area_struct * vma)
 	vma->vm_flags |= VM_IO | VM_RESERVED;
 	vma->vm_page_prot = vm_get_page_prot(vma->vm_flags);
 	fb_pgprotect(file, vma, off);
+
+	/* 使用io_remap_pfn_range函数进行内存映射[1]P461. */
 	if (io_remap_pfn_range(vma, vma->vm_start, off >> PAGE_SHIFT,
 			     vma->vm_end - vma->vm_start, vma->vm_page_prot))
 		return -EAGAIN;

@@ -1497,6 +1497,8 @@ error:
 EXPORT_SYMBOL_GPL(device_create_vargs);
 
 /**
+ * 调用该函数会在/dev目录下创建设备节点[1].
+ *
  * device_create - creates a device and registers it with sysfs
  * @class: pointer to the struct class that this device should be registered to
  * @parent: pointer to the parent struct device of this new device, if any
@@ -1519,6 +1521,8 @@ EXPORT_SYMBOL_GPL(device_create_vargs);
  *
  * Note: the struct class passed to this function must have previously
  * been created with a call to class_create().
+ * 
+ * @see Linux自动创建设备节点(http://blog.chinaunix.net/uid-26119896-id-3246974.html)
  */
 struct device *device_create(struct class *class, struct device *parent,
 			     dev_t devt, void *drvdata, const char *fmt, ...)

@@ -135,6 +135,7 @@ void sem_exit_ns(struct ipc_namespace *ns)
 	idr_destroy(&ns->ids[IPC_SEM_IDS].ipcs_idr);
 }
 #endif
+
 /**
  *@brief 初始化信号量
  */
